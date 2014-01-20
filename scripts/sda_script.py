@@ -1,6 +1,9 @@
 """ Apply the autoencoding strategy on my own data
 """
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 import numpy
 import theano
 import theano.tensor as T
@@ -49,7 +52,7 @@ def apply_dA():
 		for batch_index in xrange(n_train_batches):
 			c.append(train_da(batch_index))
 
-		print 'Traning epoch {}, cost {}'.format(epoch, numpy.mean(c))
+		logging.info('Traning epoch {}, cost {}'.format(epoch, numpy.mean(c)))
 
 	y = da.get_hidden_values(X)
 	get_y = theano.function([], y)
@@ -78,7 +81,7 @@ def apply_SdA():
 	###############
 	# BUILD MODEL #
 	###############
-	print('... building the model')
+	logging.info('... building the model')
 
 	sda = SdA(numpy_rng=numpy_rng, n_ins=n_vars,
 			  hidden_layers_sizes=[500, 125, 2], n_outs=2)
@@ -86,11 +89,11 @@ def apply_SdA():
 	#####################
 	# PRETRAINING MODEL #
 	#####################
-	print '... getting the pretraining functions'
+	logging.info('... getting the pretraining functions')
 	pretraining_fns = sda.pretraining_functions(train_set_x=X,
 												batch_size=batch_size)
 
-	print('... pre-training the model')
+	logging.info('... pre-training the model')
 	pretraining_epochs = 15
 	pretrain_lr=0.001
 	corruption_levels = [0.1, 0.2, 0.3, 0.4, 0.4, 0.4, 0.4]
@@ -101,19 +104,13 @@ def apply_SdA():
 				c.append(pretraining_fns[i](index=batch_index,
 											corruption=corruption_levels[i],
 											lr=pretrain_lr))
-			print 'Pre-training layer {}, epoch {}, cost {}'.format(
-				i, epoch, numpy.mean(c))
+			logging.info('Pre-training layer {}, epoch {}, cost {}'.format(
+				i, epoch, numpy.mean(c)))
 
 	y = sda.get_lowest_hidden_values(X)
 	get_y = theano.function([], y)
 	y_val = get_y()
 	print_array(y_val)
-
-	with open('out.pkl', 'wb') as pkl:
-		cPickle.dump(y_val, pkl)
-
-	print "... Results saved to out.pkl"
-
 
 if __name__ == '__main__':
 	apply_SdA()
