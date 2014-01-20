@@ -6,9 +6,9 @@ import theano
 import theano.tensor as T
 import cPickle
 
-from dA import dA
-from logistic_sgd import load_data
-from SdA import SdA
+from sda.dA import dA
+from sda.logistic_sgd import load_data
+from sda.SdA import SdA
 
 
 def apply_dA():

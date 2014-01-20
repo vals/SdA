@@ -3,8 +3,9 @@
 """
 from setuptools import setup, find_packages
 
-setup(name='SdA',
+print find_packages()
+
+setup(name='sda',
 	  version='0.0',
 	  author='Valentine Svensson',
-	  scripts=['scripts/sda.py'],
 	  packages=find_packages())
