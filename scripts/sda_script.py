@@ -7,21 +7,16 @@ import logging
 import numpy
 import theano
 import theano.tensor as T
-import cPickle
 
-from sda.dA import dA
-from sda.utils import load_data
+from sda.utils import load_data, print_array
 from sda.SdA import SdA
-from sda.utils import print_array
 
 logging.basicConfig(level=logging.INFO)
 
 
 def main(args):
 	logging.info('Loading data')
-	# dataset = load_data(args.input)
-	# X = dataset[0][0]
-
+	
 	X, index = load_data(args.input)
 
 	# Compute number of minibatches
@@ -38,10 +33,10 @@ def main(args):
 	logging.info(str(n_vars) + ' -> ' + ' -> '.join(map(str, args.l)))
 
 	sda = SdA(numpy_rng=numpy_rng, n_ins=n_vars,
-			  hidden_layers_sizes=args.l, n_outs=2)
+			  hidden_layers_sizes=args.l)
 
 	#####################
-	# PRETRAINING MODEL #
+	# TRAINING MODEL #
 	#####################
 	logging.info('Compiling training functions')
 	pretraining_fns = sda.pretraining_functions(train_set_x=X,
@@ -65,6 +60,7 @@ def main(args):
 	get_y = theano.function([], y)
 	y_val = get_y()
 	print_array(y_val, index=index)
+
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description=__doc__)
