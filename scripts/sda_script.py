@@ -10,7 +10,7 @@ import theano.tensor as T
 import cPickle
 
 from sda.dA import dA
-from sda.logistic_sgd import load_data
+from sda.utils import load_data
 from sda.SdA import SdA
 from sda.utils import print_array
 
@@ -18,13 +18,16 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main(args):
-	dataset = load_data(args.input)
-	X = dataset[0][0]
+	logging.info('... loading data')
+	# dataset = load_data(args.input)
+	# X = dataset[0][0]
+
+	X, index = load_data(args.input)
 
 	# Compute number of minibatches
 	batch_size = 10
-	n_train_batches, n_vars = X.get_value(borrow=True).shape
-	n_train_batches /= batch_size
+	n_samples, n_vars = X.get_value(borrow=True).shape
+	n_train_batches = n_samples / batch_size
 
 	numpy_rng = numpy.random.RandomState(23432)
 
@@ -43,7 +46,7 @@ def main(args):
 	pretraining_fns = sda.pretraining_functions(train_set_x=X,
 												batch_size=batch_size)
 
-	logging.info('... pre-training the model')
+	logging.info('... Training the model')
 	pretraining_epochs = 15
 	pretrain_lr=0.001
 	corruption_levels = [0.1, 0.2, 0.3, 0.4, 0.4, 0.4, 0.4]
@@ -54,13 +57,13 @@ def main(args):
 				c.append(pretraining_fns[i](index=batch_index,
 											corruption=corruption_levels[i],
 											lr=pretrain_lr))
-			logging.info('Pre-training layer {}, epoch {}, cost {}'.format(
+			logging.info('Training layer {}, epoch {}, cost {}'.format(
 				i, epoch, numpy.mean(c)))
 
 	y = sda.get_lowest_hidden_values(X)
 	get_y = theano.function([], y)
 	y_val = get_y()
-	print_array(y_val)
+	print_array(y_val, index=index)
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
