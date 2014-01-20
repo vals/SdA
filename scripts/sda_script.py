@@ -15,57 +15,6 @@ from sda.SdA import SdA
 from sda.utils import print_array
 
 
-def apply_dA():
-	# Load data from file
-	dataset = load_data('/Users/val/Documents/cell-cycle/top_expression.pkl.gz')
-	X = dataset[0][0]
-
-	# compute number of minibatches for training, validation and testing
-	batch_size = 15
-	n_train_batches = X.get_value(borrow=True).shape[0] / batch_size
-
-	# allocate symbolic variables for the data
-	index = T.lscalar()  # index to a [mini]batch
-	x = T.matrix('x')
-
-	###############
-	# BUILD MODEL #
-	###############
-
-	rng = numpy.random.RandomState(123)
-	da = dA(numpy_rng=rng, input=x, n_visible=2000, n_hidden=2)
-
-	cost, updates = da.get_cost_updates(corruption_level=0.,
-										learning_rate=0.1)
-
-	train_da = theano.function([index], cost, updates=updates,
-		givens={x: X[index * batch_size:(index + 1) * batch_size]})
-
-	###############
-	# TRAIN MODEL #
-	###############
-
-	# go through training epochs
-	training_epochs = 15
-	for epoch in xrange(training_epochs):
-		c = []
-		for batch_index in xrange(n_train_batches):
-			c.append(train_da(batch_index))
-
-		logging.info('Traning epoch {}, cost {}'.format(epoch, numpy.mean(c)))
-
-	y = da.get_hidden_values(X)
-	get_y = theano.function([], y)
-	y_val = get_y()
-	print y_val.T
-	print y_val.shape
-
-	with open('out.pkl', 'wb') as pkl:
-		cPickle.dump(da.W.get_value(borrow=True), pkl)
-
-	print 'Saved output'
-
-
 def apply_SdA():
 	# dataset = load_data('/Users/val/Documents/cell-cycle/top_expression.pkl.gz')
 	dataset = load_data('/Users/val/Documents/cell-cycle/test.pkl.gz')
