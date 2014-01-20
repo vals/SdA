@@ -8,4 +8,5 @@ print find_packages()
 setup(name='sda',
 	  version='0.0',
 	  author='Valentine Svensson',
-	  packages=find_packages())
+	  packages=find_packages(),
+	  scripts=['scripts/sda_script.py'])
