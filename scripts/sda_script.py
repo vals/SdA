@@ -1,8 +1,8 @@
-""" Apply the autoencoding strategy on my own data
+#!/usr/bin/env python
+""" Dimensionality reduction by Stacked denoising Autoencoders
 """
-
+import argparse
 import logging
-logging.basicConfig(level=logging.INFO)
 
 import numpy
 import theano
@@ -14,10 +14,11 @@ from sda.logistic_sgd import load_data
 from sda.SdA import SdA
 from sda.utils import print_array
 
+logging.basicConfig(level=logging.INFO)
 
-def apply_SdA():
-	# dataset = load_data('/Users/val/Documents/cell-cycle/top_expression.pkl.gz')
-	dataset = load_data('/Users/val/Documents/cell-cycle/test.pkl.gz')
+
+def main(args):
+	dataset = load_data(args.input)
 	X = dataset[0][0]
 
 	# Compute number of minibatches
@@ -62,4 +63,8 @@ def apply_SdA():
 	print_array(y_val)
 
 if __name__ == '__main__':
-	apply_SdA()
+	parser = argparse.ArgumentParser()
+	parser.add_argument('input')
+	args = parser.parse_args()
+	
+	main(args)
