@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main(args):
-	logging.info('... loading data')
+	logging.info('Loading data')
 	# dataset = load_data(args.input)
 	# X = dataset[0][0]
 
@@ -34,22 +34,23 @@ def main(args):
 	###############
 	# BUILD MODEL #
 	###############
-	logging.info('... building the model')
+	logging.info('Building model')
+	logging.info(str(n_vars) + ' -> ' + ' -> '.join(map(str, args.l)))
 
 	sda = SdA(numpy_rng=numpy_rng, n_ins=n_vars,
-			  hidden_layers_sizes=[500, 125, 2], n_outs=2)
+			  hidden_layers_sizes=args.l, n_outs=2)
 
 	#####################
 	# PRETRAINING MODEL #
 	#####################
-	logging.info('... getting the pretraining functions')
+	logging.info('Compiling training functions')
 	pretraining_fns = sda.pretraining_functions(train_set_x=X,
 												batch_size=batch_size)
 
-	logging.info('... Training the model')
+	logging.info('Training model')
 	pretraining_epochs = 15
-	pretrain_lr=0.001
-	corruption_levels = [0.1, 0.2, 0.3, 0.4, 0.4, 0.4, 0.4]
+	pretrain_lr = 0.001
+	corruption_levels = [0.1, 0.2, 0.3] + [0.4] * sda.n_layers
 	for i in xrange(sda.n_layers):
 		for epoch in xrange(pretraining_epochs):
 			c = []
@@ -66,8 +67,11 @@ def main(args):
 	print_array(y_val, index=index)
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser()
+	parser = argparse.ArgumentParser(description=__doc__)
 	parser.add_argument('input')
+	parser.add_argument('-l', nargs='+', type=int, default=[2],
+						help='List of hidden layer sizes, last size'
+						' will be the final dimension of output')
 	args = parser.parse_args()
 	
 	main(args)
