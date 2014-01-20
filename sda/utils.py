@@ -1,13 +1,16 @@
 """ This file contains different utility functions that are not connected
 in anyway to the networks presented in the tutorials, but rather help in
 processing the outputs into a more understandable way.
-
-For example ``tile_raster_images`` helps in generating a easy to grasp
-image from a set of samples or weights.
 """
 
-
 import numpy
+
+
+def print_array(X, sep='\t'):
+    """ Prints array to standard out in csv style format.
+    """
+    for row in X:
+        print(sep.join(map(str, row)))
 
 
 def scale_to_unit_interval(ndar, eps=1e-8):

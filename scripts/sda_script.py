@@ -9,6 +9,7 @@ import cPickle
 from sda.dA import dA
 from sda.logistic_sgd import load_data
 from sda.SdA import SdA
+from sda.utils import print_array
 
 
 def apply_dA():
@@ -106,8 +107,7 @@ def apply_SdA():
 	y = sda.get_lowest_hidden_values(X)
 	get_y = theano.function([], y)
 	y_val = get_y()
-	print y_val.T
-	print y_val.shape
+	print_array(y_val)
 
 	with open('out.pkl', 'wb') as pkl:
 		cPickle.dump(y_val, pkl)
